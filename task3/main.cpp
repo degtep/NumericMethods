@@ -5,21 +5,22 @@
 #include "integrator.h"
 
 int main() {
-    const double maxError = 1e-8;
-    double error;
-    std::cerr << "Calculating integral with max error = " << maxError << " ..." << std::endl;
+    const int precision = 8;
+    const double maxRelativeError = 1.0 / std::pow(10, precision);
+    std::cerr << "Calculating integral with max relative error = "
+              << maxRelativeError
+              << " ..." << std::endl;
     double result = createIntegrator(
                 createIntegrator(
-                    createIntegrator(TaskFunction(), BoundFunctionZ(), maxError),
-                    BoundFunctionY(), maxError),
-                BoundFunctionX(), maxError).integrate(&error);
+                    createIntegrator(TaskFunction(), BoundFunctionZ(), maxRelativeError),
+                    BoundFunctionY(), maxRelativeError),
+                BoundFunctionX(), maxRelativeError).integrate();
 
-    std::cerr << "Error = " << error << std::endl;
-    std::cerr.precision(12);
+    std::cerr.precision(precision);
     std::cerr << "Result = " << result << std::endl;
 
     std::ofstream os("outfile.txt");
-    os.precision(12);
+    os.precision(precision);
     os << result << std::endl;
     os.close();
 

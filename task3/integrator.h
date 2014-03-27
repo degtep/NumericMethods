@@ -40,30 +40,32 @@ public:
 template <typename TFunc, typename TBoundFunc>
 class Integrator {
 private:
-    double m_maxError;
+    double m_maxRelativeError;
     const TFunc &m_func;
     const TBoundFunc &m_boundFunc;
 public:
-    Integrator(const TFunc& func, const TBoundFunc &boundFunc, double maxError)
-        : m_maxError(maxError), m_func(func), m_boundFunc(boundFunc)
+    Integrator(const TFunc& func, const TBoundFunc &boundFunc, const double maxRelativeError)
+        : m_maxRelativeError(maxRelativeError), m_func(func), m_boundFunc(boundFunc)
     {}
 
-    double operator()(const std::vector<double> &data, double *error = NULL) const
+    double operator()(const std::vector<double> &data) const
     {
-        return Romberg(IntegratorMapper<TFunc, TBoundFunc>(m_func, m_boundFunc, data), m_maxError, error);
-        //return rombergSum(IntegratorMapper<TFunc, TBoundFunc>(m_func, m_boundFunc, data), m_chunkCount, error);
+        return Romberg(IntegratorMapper<TFunc, TBoundFunc>(m_func, m_boundFunc, data),
+                       m_maxRelativeError);
     }
 
-    double integrate(double *error = NULL) const
+    double integrate() const
     {
         std::vector<double> data;
-        return this->operator()(data, error);
+        return this->operator()(data);
     }
 };
 
 template <typename TFunc, typename TBoundFunc>
-Integrator<TFunc, TBoundFunc> createIntegrator(const TFunc& func, const TBoundFunc &bound_func, double maxError) {
-    return Integrator<TFunc, TBoundFunc>(func, bound_func, maxError);
+Integrator<TFunc, TBoundFunc> createIntegrator
+(const TFunc& func, const TBoundFunc &bound_func, const double maxRelativeError)
+{
+    return Integrator<TFunc, TBoundFunc>(func, bound_func, maxRelativeError);
 }
 
 #endif // INTEGRATOR_H

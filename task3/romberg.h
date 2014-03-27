@@ -5,7 +5,7 @@
 #include <vector>
 
 template <typename TFunc>
-double Romberg(const TFunc &func, const double &maxError, double *error = NULL)
+double Romberg(const TFunc &func, const double &maxRelativeError)
 {
     double lowBound = func.lowBound();
     double highBound = func.highBound();
@@ -38,13 +38,14 @@ double Romberg(const TFunc &func, const double &maxError, double *error = NULL)
             nextStep.push_back((pow(4.0, k) * nextStep[k-1] - currentStep[k-1])
                     / (pow(4.0, k) - 1));
         }
-        if (iteration >= 4 && fabs(nextStep[iteration] - currentStep[iteration-1]) < maxError)
+        if (iteration >= 4)
         {
-            if (error != NULL)
+            double currentError = fabs(nextStep[iteration] - currentStep[iteration-1])
+                    / nextStep[iteration];
+            if (currentError < maxRelativeError)
             {
-                *error = fabs(nextStep[iteration] - currentStep[iteration-1]);
+                break;
             }
-            break;
         }
     }
     return nextStep[iteration];
